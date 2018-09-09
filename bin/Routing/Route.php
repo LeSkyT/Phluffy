@@ -3,58 +3,53 @@
 namespace Routing {
 
 	class Route {
-		protected $uri;
-		protected $caller = array();
-		protected $variables;
+		protected $templateUri;
+		protected $controller;
+		protected $method;
+		protected $requestMethod;
 
-		public function __construct($uri, $caller = array(), $variables = array())
+		public function __construct(String $templateUri, String $controller, String $method, String $requestMethod = 'GET')
 		{
-			$this->uri = $uri;
-			$this->caller = $caller;
-			$this->variables = $variables;
+			// TemplateUri.
+			$this->templateUri = new TemplateUri($templateUri);
 
-			if(empty($this->caller)){
-				$this->default();
-			}
+			// Controller.
+			$this->controller = $controller;
+
+			// Method.
+			$this->method = $method;
+
+			// Http Request method.
+			$method_list = array('POST', 'GET', 'DELETE');
+			if (in_array(strtoupper($requestMethod), $method_list))
+				$this->requestMethod = strtoupper($requestMethod);
+			else
+				throw new \Exception('Unknown HTTP Request method : \'' . $requestMethod . '\'.');
 		}
 
-		public function getController(): string
+		public function getController(): String
 		{
-			return $this->caller['Controller'];
+			return $this->controller;
 		}
 
-		public function getMethod(): string
+		public function getMethod(): String
 		{
-			return $this->caller['Method'];
+			return $this->method;
 		}
 
-		public function getVariables(): array
+		public function getRequestMethod(): String
 		{
-			return $this->variables;
+			return $this->requestMethod;
 		}
 
-		protected function default() {
-			if (preg_match('/^\/(([A-Za-z]+)((\/([A-Za-z]+))((\/.+)*))?)?$/', $this->uri, $matches)) {
-
-				$this->caller['Controller'] = (empty($matches[2]) ? 'Home' : $matches[2]) . 'Controller';
-				$this->caller['Method'] = (empty($matches[5]) ? 'index' : $matches[5]);
-				if (!empty($matches[6])) {
-					$this->variables = explode('/', substr($matches[6], 1));
-				}
-			} else {
-				throw new \Exception('Malformated URI: \'' . $this->uri . '\'.');
-			}
+		public function match(HttpRequest $request): bool
+		{
+			return $this->templateUri->match($request->getUri()) && $this->getRequestMethod() == $request->getRequestMethod();
 		}
 
-		public function __toString(): string
+		public function getParams(): Array 
 		{
-			$JsonObject = array(
-				'Controller' => $this->caller['Controller'],
-				'Method' => $this->caller['Method'],
-				'Variables' => $this->variables
-			);
-
-			return json_encode($JsonObject);
+			return $this->templateUri->getParams();
 		}
 	}
 }

@@ -1,0 +1,8 @@
+[
+	{
+		"Uri": "/",
+		"RequestMethod":"GET",
+		"Controller":"HomeController",
+		"Action":"index"
+	}
+]

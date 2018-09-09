@@ -4,14 +4,13 @@ class Autoloader {
 
 	protected static $dirs = array();
 	protected static $registered = FALSE;
-	public static $rootDir = DIRECTORY_SEPARATOR . 'Phluffy';
 
 	public static function init() {
-		self::$dirs['Bin'] = $_SERVER['DOCUMENT_ROOT'] . self::$rootDir . DIRECTORY_SEPARATOR . 'bin';
-		self::$dirs['Model'] = $_SERVER['DOCUMENT_ROOT'] . self::$rootDir . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'models';
-		self::$dirs['View'] = $_SERVER['DOCUMENT_ROOT'] . self::$rootDir . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'views';
-		self::$dirs['Controller'] = $_SERVER['DOCUMENT_ROOT'] . self::$rootDir . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'controllers';
-		self::$dirs['Library'] = $_SERVER['DOCUMENT_ROOT'] . self::$rootDir . DIRECTORY_SEPARATOR . 'lib';
+		self::$dirs['Bin'] 			= $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'bin';
+		self::$dirs['Library'] 		= $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'lib';
+		self::$dirs['Model'] 		= $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'models';
+		self::$dirs['View'] 		= $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'views';
+		self::$dirs['Controller'] 	= $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'controllers';
 
 		self::register();
 	}
@@ -28,6 +27,13 @@ class Autoloader {
 	public static function autoload($className) : bool
 	{
 		$success = FALSE;
+
+		// Special Treatment for Twig Classes.
+		if (preg_match('/^Twig_/', $className)) {
+			$fileName = str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
+			if (self::loadFile($self::$dirs['Library'] . DIRECTORY_SEPARATOR . $fileName))
+				return TRUE;
+		}
 
 		$fileName = str_replace('\\', DIRECTORY_SEPARATOR, $className) . '.php';
 

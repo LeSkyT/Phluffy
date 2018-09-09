@@ -1,0 +1,14 @@
+RewriteEngine On
+
+RewriteBase /
+
+<Files .*>
+	Order Deny,Allow
+	Deny From All
+</Files>
+
+RewriteCond %{REQUEST_FILENAME} !-f
+
+#RewriteCond %{REQUEST_URI} !\.(?:css|jpe?g|js|gif|png|bmp|zip|pdf)$ [NC]
+
+RewriteRule ^(.*)$ index.php [PT]

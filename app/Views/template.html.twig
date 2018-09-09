@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>{% block title %}{% endblock %}</title>
+		{% block javascript %}{% endblock %}
+		{% block sylesheet %}{% endblock %}
+
+		{% block metavars %}{% endblock %}
+	</head>
+	<body>
+		<div id="header">{% block header %}{% endblock %}</div>
+		<div id="content">{% block content %}{% endblock %}</div>
+		<div id="footer">{% block footer %}{% endblock %}</div>
+	</body>
+</html>
